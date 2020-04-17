@@ -855,10 +855,14 @@ public class JedisConnectionFactory implements InitializingBean, DisposableBean,
 
 			Jedis jedis = new Jedis(node.getHost(), node.getPort(), getConnectTimeout(), getReadTimeout());
 
-			if (jedis.ping().equalsIgnoreCase("pong")) {
+			try {
+				if (jedis.ping().equalsIgnoreCase("pong")) {
 
-				potentiallySetClientName(jedis);
-				return jedis;
+					potentiallySetClientName(jedis);
+					return jedis;
+				}
+			} catch (Exception ex) {
+				log.warn(String.format("Ping failed for sentinel host:%s", node.getHost()), ex);
 			}
 		}
 
